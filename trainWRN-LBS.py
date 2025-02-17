@@ -192,8 +192,6 @@ def main():
         os.makedirs(args.out, exist_ok=True)
         args.writer = SummaryWriter(args.out)
 
-    # if args.dataset == 'cifar10':
-    # args.num_classes = 5
     if args.arch == 'wideresnet':
         args.model_depth = 28
         args.model_width = 2
@@ -201,72 +199,19 @@ def main():
         args.model_cardinality = 4
         args.model_depth = 28
         args.model_width = 4
-    # train_path = './data/MQTT/train.npy'
-    # test_path = './data/MQTT/test.npy'
-    train_X = np.load('./data/CICIDS2017/LBS/train_x_lbs33_choose1.npy')
-    train_Y = np.load('./data/CICIDS2017/LBS/train_y_lbs33_choose1.npy')
-    test_X = np.load('./data/CICIDS2017/LBS/val_x_lbs33_choose4.npy')
-    test_Y = np.load('./data/CICIDS2017/LBS/val_y_lbs33_choose4.npy')
-    # ind1, time1 = np.unique(train_Y, return_counts=True)
-    # ind2, time2 = np.unique(test_Y, return_counts=True)
-    # print(ind1, time1)
-    # print(ind2, time2)
-    # import pdb;
-    # pdb.set_trace()
-    # train_X, train_Y = data_reader(train_path)
-    # test_X, test_Y = data_reader(test_path)
-    # train_X = np.load('./data/ISCX2012/LBS/train_x_lbs33_clean2.npy')
-    # train_Y = np.load('./data/ISCX2012/LBS/train_y_lbs33_clean2.npy')
-    # test_X = np.load('./data/ISCX2012/LBS/val_x_lbs33_clean2.npy')
-    # test_Y = np.load('./data/ISCX2012/LBS/val_y_lbs33_clean2.npy')
-    # train_X = np.load('./data/MQTT/LBS/train_x_lbs33_clean1.npy')
-    # train_Y = np.load('./data/MQTT/LBS/train_y_lbs33_clean1.npy')
-    # test_X = np.load('./data/MQTT/LBS/val_x_lbs33_clean1.npy')
-    # test_Y = np.load('./data/MQTT/LBS/val_y_lbs33_clean1.npy')
-    # train_X = np.load('./data/vpn2016/train_x_s30.npy')
-    # train_Y = np.load('./data/vpn2016/train_y_s30.npy')
-    # test_X = np.load('./data/vpn2016/test_x_s30_choose.npy')
-    # test_Y = np.load('./data/vpn2016/test_y_s30_choose.npy')
-
-    # import pdb;pdb.set_trace()
-    # def x_u_split(num_labeled, num_classes, labels):
-    #     label_per_class = num_labeled // num_classes
-    #     labels = np.array(labels)
-    #     labeled_idx = []
-    #     # unlabeled data: all data (https://github.com/kekmodel/FixMatch-pytorch/issues/10)
-    #     unlabeled_idx = np.array(range(len(labels)))
-    #     for i in range(num_classes):
-    #         idx = np.where(labels == i)[0]
-    #         idx = np.random.choice(idx, label_per_class, False)
-    #         labeled_idx.extend(idx)
-    #     labeled_idx = np.array(labeled_idx)
-    #     assert len(labeled_idx) == num_labeled
-    #     np.random.shuffle(labeled_idx)
-    #     return labeled_idx, unlabeled_idx
-
-    # train_labeled_idxs, train_unlabeled_idxs = x_u_split(args.num_labeled, args.num_classes, train_Y)
-    # train_unlabeled_X = train_X[train_unlabeled_idxs]
+   
+    train_X = np.load('./data/CICIDS2017/LBS/train_x_lbs32.npy')
+    train_Y = np.load('./data/CICIDS2017/LBS/train_y_lbs32.npy')
+    test_X = np.load('./data/CICIDS2017/LBS/val_x_lbs32.npy')
+    test_Y = np.load('./data/CICIDS2017/LBS/val_y_lbs32.npy')
+    
     train_unlabeled_X = train_X
-    # train_unlabeled_X_w, train_unlabeled_X_s = DataTransform(train_unlabeled_X)
+
     train_unlabeled_dataset = UnlabelMyDataset2(train_unlabeled_X)
     unlabeled_trainloader = DataLoader(train_unlabeled_dataset, batch_size=args.mu * args.batch_size,
                                        sampler=RandomSampler(train_unlabeled_dataset), drop_last=True)
     args.eval_step = len(unlabeled_trainloader)
-    # train_labeled_x = np.load('./data/ISCX2012/LBS/train_labeled_5per0.npy')[:, :-1]
-    # train_labeled_y = np.load('./data/ISCX2012/LBS/train_labeled_5per0.npy')[:, -1]
-    # train_labeled_X = np.load('./data/CICIDS2017/LBS/train_labeled_5per1.npy')[:, :-1]
-    # train_labeled_Y = np.load('./data/CICIDS2017/LBS/train_labeled_5per1.npy')[:, -1]
-    # labeled_idx = np.arange(train_labeled_X.shape[0])
-    # if args.expand_labels or args.num_labeled < args.batch_size:
-    #     num_expand_x = math.ceil(
-    #             args.batch_size * args.eval_step / args.num_labeled)
-    #     labeled_idx = np.hstack([labeled_idx for _ in range(num_expand_x)])
-    #     np.random.shuffle(labeled_idx)
-    # train_labeled_X = train_labeled_X[labeled_idx]
-    # train_labeled_Y = train_labeled_Y[labeled_idx]
-
-    # import pdb;pdb.set_trace()
-    # test_X = test_X / 255
+   
     def x_u_split(labels):
         labeled_idx = np.arange(labels.shape[0])
         if args.expand_labels or args.num_labeled < args.batch_size:
@@ -275,10 +220,7 @@ def main():
             labeled_idx = np.hstack([labeled_idx for _ in range(num_expand_x)])
         np.random.shuffle(labeled_idx)
         return labeled_idx
-
-    # labeled_idx = x_u_split(train_labeled_y)
-    # train_labeled_X = train_labeled_x[labeled_idx]
-    # train_labeled_Y = train_labeled_y[labeled_idx]
+        
     train_labeled_X = train_X
     train_labeled_Y = train_Y
     test_dataset = MyDataset(test_X, test_Y)
@@ -288,41 +230,6 @@ def main():
     labeled_trainloader = DataLoader(train_labeled_dataset, batch_size=args.batch_size,
                                      sampler=RandomSampler(train_labeled_dataset), drop_last=True)
 
-
-
-    # if args.local_rank not in [-1, 0]:
-    #     torch.distributed.barrier()
-
-    # labeled_dataset, unlabeled_dataset, test_dataset = DATASET_GETTERS[args.dataset](
-    #     args, './data')
-
-    # if args.local_rank == 0:
-    #     torch.distributed.barrier()
-
-    # train_sampler = RandomSampler if args.local_rank == -1 else DistributedSampler
-    #
-    # labeled_trainloader = DataLoader(
-    #     labeled_dataset,
-    #     sampler=train_sampler(labeled_dataset),
-    #     batch_size=args.batch_size,
-    #     num_workers=args.num_workers,
-    #     drop_last=True)
-    #
-    # unlabeled_trainloader = DataLoader(
-    #     unlabeled_dataset,
-    #     sampler=train_sampler(unlabeled_dataset),
-    #     batch_size=args.batch_size*args.mu,
-    #     num_workers=args.num_workers,
-    #     drop_last=True)
-    #
-    # test_loader = DataLoader(
-    #     test_dataset,
-    #     sampler=SequentialSampler(test_dataset),
-    #     batch_size=args.batch_size,
-    #     num_workers=args.num_workers)
-
-    # if args.local_rank not in [-1, 0]:
-    #     torch.distributed.barrier()
 
     model = create_model(args)
 
@@ -534,16 +441,6 @@ def train(args, labeled_trainloader, unlabeled_trainloader, test_loader,
             inputs_u_w, inputs_u_s =DataTransform(inputs_u,args.agu_level)
             inputs_u_w1, inputs_u_s1 =DataTransform(inputs_u1,args.agu_level)
 
-            # try:
-            #     (inputs_u_w, inputs_u_s), _ = unlabeled_iter.next()
-            #     (inputs_u_w1, inputs_u_s1), _ = unlabeled_iter.next()
-            # except:
-            #     unlabeled_iter = iter(unlabeled_trainloader)
-            #     (inputs_u_w, inputs_u_s), _ = unlabeled_iter.next()
-            #     (inputs_u_w1, inputs_u_s1), _ = unlabeled_iter.next()
-
-            # import pdb;pdb.set_trace()
-            # data_time.update(time.time() - end)
             batch_size = inputs_x.shape[0]
 
 
