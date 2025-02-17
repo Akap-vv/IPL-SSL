@@ -1,6 +1,6 @@
 # Semi-Supervised Learning with Interpolation and Pseudo-Labeling for Few-Label Intrusion Detection
 ### Overview
-This paper proposes IPL-SeSL, a novel SeSL framework that synergistically integrates Interpolation and Pseudo-Labeling mechanisms to enhance IDS's performance under severe label constraints.} IPL-SeSL consists of a supervised branch, a pseudo-labeling branch, and an interpolation branch. In the pseudo-labeling branch, we propose a data augmentation method specifically designed for network traffic data, which enhances the model’s robustness and generalization ability. The interpolation mechanism introduces a novel sample generation strategy that reinforces decision boundaries through geometrically meaningful feature space transformations.
+This paper proposes IPL-SeSL, a novel SeSL framework that synergistically integrates Interpolation and Pseudo-Labeling mechanisms to enhance IDS's performance under severe label constraints. IPL-SeSL consists of a supervised branch, a pseudo-labeling branch, and an interpolation branch. In the pseudo-labeling branch, we propose a data augmentation method specifically designed for network traffic data, which enhances the model’s robustness and generalization ability. The interpolation mechanism introduces a novel sample generation strategy that reinforces decision boundaries through geometrically meaningful feature space transformations.
 
 ### Requirements
 All experiments are implemented on the PyTorch platform with an NVIDIA RTX 3090 GPU.
